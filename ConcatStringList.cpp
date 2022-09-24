@@ -46,12 +46,9 @@ ConcatStringList::ConcatStringList(const char * s){
     nChar = i;
     nNode =1;
     
-    ContinuingRef_ConcatStringList(tempCALN);
-}
-
-void ConcatStringList::ContinuingRef_ConcatStringList(pCALN tempCALN){
+    //Reference
     refList.addBackRefNode(tempCALN, 2);
-
+    //
 }
 
 int ConcatStringList::length() const{
@@ -109,22 +106,19 @@ ConcatStringList ConcatStringList::concat(const ConcatStringList & otherS) const
     nObj.nNode = nNode + otherS.nNode;
     nObj.nChar = nChar + otherS.nChar;
     
-    ContinuingRef_concat(nObj);
-
-    return std::move(nObj);
-}
-
-void ConcatStringList::ContinuingRef_concat(ConcatStringList &nObj ) const {
+    //Reference 
     pCALN roam = nObj.head;
-    
     while(roam->next){
         roam = roam->next;
     }
 
     refList.increaseNumberOfReferenceAt(nObj.head, 1);
     refList.increaseNumberOfReferenceAt(roam, 1);
+    //
 
+    return std::move(nObj);
 }
+
 
 
 ConcatStringList ConcatStringList::subString(int from, int to) const{
@@ -153,7 +147,10 @@ ConcatStringList ConcatStringList::subString(int from, int to) const{
         if(tempStr.size()){
             pCALN tempCALN = new CharALNode(tempStr, nullptr);
             result.nNode++;
-
+            
+            //Reference Add
+            refList.addBackRefNode(tempCALN, 0);
+            
             if(result.head == nullptr){
                 result.head = tempCALN;
                 result.tail = tempCALN;
@@ -163,24 +160,19 @@ ConcatStringList ConcatStringList::subString(int from, int to) const{
                 result.tail = result.tail->next;
             }
 
-            //Ref
-            ContinuingRef_subString(tempCALN) ;
         }
 
         tempSize+= roam->CharArrayList.size();
         roam = roam->next;
     }
 
+    //Reference increase
+
+    refList.increaseNumberOfReferenceAt(result.head, 1);
+    refList.increaseNumberOfReferenceAt(result.tail, 1);
 
     return result;
 }
-
-
-void ConcatStringList::ContinuingRef_subString(pCALN tempCALN ) const  {
-    refList.addBackRefNode(tempCALN, 0);
-
-}
-
 
 ConcatStringList ConcatStringList::reverse() const{
     ConcatStringList result;
@@ -199,6 +191,9 @@ ConcatStringList ConcatStringList::reverse() const{
         if(tempStr.size()){
             pCALN tempCALN = new CharALNode(tempStr, nullptr);
 
+            //Reference Add
+            refList.addBackRefNode(tempCALN, 0);
+
             if(result.tail == nullptr){
                 result.head = tempCALN;
                 result.tail = tempCALN;
@@ -212,6 +207,12 @@ ConcatStringList ConcatStringList::reverse() const{
         tempSize+= roam->CharArrayList.size();
         roam = roam->next;
     }
+    
+    //Reference increase
+
+    refList.increaseNumberOfReferenceAt(result.head, 1);
+    refList.increaseNumberOfReferenceAt(result.tail, 1);
+
     return result;
 }
 

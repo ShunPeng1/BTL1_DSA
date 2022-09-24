@@ -49,12 +49,6 @@ public:
     ConcatStringList reverse() const;
     ~ConcatStringList();
 
-public:
-    //Function continue from above Function
-    void ContinuingRef_ConcatStringList(CharALNode *);
-    void ContinuingRef_concat(ConcatStringList &) const;
-    void ContinuingRef_subString(CharALNode *) const;
-    void ContinuingRef_reverse();
 
 public:
     class ReferencesList {

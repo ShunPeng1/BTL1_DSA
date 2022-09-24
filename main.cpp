@@ -33,7 +33,7 @@ void tc2() {
     ConcatStringList s4 = s1.concat(s2).concat(s3);
     cout << "s4: " << s4.toString() << endl;
     cout<<"Current Ref \n"; ConcatStringList::refList.printRef();
-    
+
     cout << "s1: " << s1.toString() << endl;
     cout << "s2: " << s2.toString() << endl;
 
@@ -75,6 +75,120 @@ void tc2() {
 
 }
 
+void tc22() {
+    ConcatStringList s1("Hello,");
+
+    ConcatStringList s2("_this_is");
+    ConcatStringList s3("_an_assignment");
+    ConcatStringList s4("_new_string_");
+    
+    ConcatStringList s11 = s1.reverse();
+    cout << "s11: " << s11.toString() << endl;
+    cout<<"Current Ref 1\n";
+    ConcatStringList::refList.printRef();
+
+    ConcatStringList s111 = s11.reverse();
+    cout << "s111: " << s111.toString() << endl;
+    cout<<"Current Ref 2\n";
+    ConcatStringList::refList.printRef();
+
+    ConcatStringList s1111 = s111.reverse();
+    cout << "s1111: " << s1111.toString() << endl;
+    cout<<"Current Ref 3\n";
+    ConcatStringList::refList.printRef();
+
+    // ConcatStringList s100 = s1.concat(s11).concat(s111).concat(s1111);
+    // ConcatStringList::refList.printRef();
+
+
+    // cout << "s100: " << s100.toString() << endl;
+    // ConcatStringList s110 = s100.subString(3,16);
+    // cout << "s110: " << s110.toString() << endl;
+    // cout << "s100: " << s100.toString() << endl;
+    //ConcatStringList s5 = s1.concat(s2).reverse().subString(2, 4).concat(s44);
+    //cout << "s5: " << s5.toString() << endl;
+
+
+    // test reverse
+   // ConcatStringList s7 = s4.reverse();
+    //cout << "s7: " << s7.toString() << endl;
+    //cout << "s4: " << s4.toString() << endl;
+    
+    //cout << "s1: " << s1.toString() << endl;
+
+}
+
+void tc23() {
+    ConcatStringList s1("Hello,");
+
+    ConcatStringList s2("_this_is");
+    ConcatStringList s3("_an_assignment");
+    
+    ConcatStringList s11 = s1.reverse();
+    cout << "s11: " << s11.toString() << endl;
+    cout<<"Current Ref 1\n";
+    ConcatStringList::refList.printRef();
+
+    ConcatStringList s111 = s11.reverse();
+    cout << "s111: " << s111.toString() << endl;
+    cout<<"Current Ref 2\n";
+    ConcatStringList::refList.printRef();
+
+    // ConcatStringList s110 = s111.subString(2,5);
+    // cout << "s110: " << s110.toString() << endl;
+    // cout << "s111: " << s111.toString() << endl;
+    // cout<<"Current Ref 3\n";
+    // ConcatStringList::refList.printRef();
+
+    
+    ConcatStringList s100 = s111.subString(2,5).subString(1,2);
+    cout << "s100: " << s100.toString() << endl;
+    cout << "s111: " << s111.toString() << endl;
+    cout<<"Current Ref 4\n";
+    ConcatStringList::refList.printRef();
+
+}
+
+void tc24() {
+    ConcatStringList s1("Hello,");
+    ConcatStringList s2("_this_is");
+    ConcatStringList s3("_an_assignment");
+    ConcatStringList s4("_which_no_one_like");
+
+    ConcatStringList s11 = s1.reverse();
+    cout << "s11: " << s11.toString() << endl;
+    cout<<"Current Ref 1\n";
+    ConcatStringList::refList.printRef();
+
+    ConcatStringList s111 = s11.reverse();
+    cout << "s111: " << s111.toString() << endl;
+    cout<<"Current Ref 2\n";
+    ConcatStringList::refList.printRef();
+    
+    ConcatStringList s100 = s111.subString(2,4);
+    cout << "s100: " << s100.toString() << endl;
+    
+    
+    ConcatStringList s5 = s1.concat(s2);
+    cout << "s5: " << s5.toString() << endl;
+
+
+    ConcatStringList s6 = s3.concat(s4).concat(s5);
+    cout << "s6: " << s6.toString() << endl;
+
+    cout<<"Current Ref 4\n";
+    ConcatStringList::refList.printRef();
+    
+    cout <<"refList.size() = " << ConcatStringList::refList.size() << endl;
+    cout <<"refList.refCountAt(0) = "<< ConcatStringList::refList.refCountAt(0) << endl;
+    cout <<"refList.refCountAt(1) = "<< ConcatStringList::refList.refCountAt(1) << endl;
+    cout <<"refList.refCountAt(2) = "<< ConcatStringList::refList.refCountAt(2) << endl;
+    cout <<"refList.refCountAt(3) = "<< ConcatStringList::refList.refCountAt(3) << endl;
+    cout <<"refList.refCountAt(4) = "<< ConcatStringList::refList.refCountAt(4) << endl;
+    cout <<"refList.refCountAt(5) = "<< ConcatStringList::refList.refCountAt(5) << endl;
+    cout << ConcatStringList::refList.refCountsString() << endl;
+}
+
 // void tc3() {
 //     ConcatStringList * s1 = new ConcatStringList("Hello");
 //     ConcatStringList * s2 = new ConcatStringList("_world");
@@ -99,8 +213,80 @@ void tc2() {
 //     cout << ConcatStringList::delStrList.totalRefCountsString() << endl;
 // }
 
+void tc31() {
+    ConcatStringList * s1 = new ConcatStringList("Hello,");
+    ConcatStringList * s2 = new ConcatStringList("_this_is");
+    ConcatStringList * s3 = new ConcatStringList("_an_assignment");
+    ConcatStringList * s4 = new ConcatStringList(s1->concat(*s2));
+    ConcatStringList * s5 = new ConcatStringList(s4->concat(*s3));
+    cout << ConcatStringList::refList.refCountsString() << endl;
+    cout << ConcatStringList::delStrList.totalRefCountsString() << endl;
 
+
+    cout << "---After deleting s2---" << endl;
+    delete s2;
+    cout << ConcatStringList::refList.refCountsString() << endl;
+    cout << ConcatStringList::delStrList.totalRefCountsString() << endl;
+
+    cout << "---After deleting s4---" << endl;
+    delete s4;
+    cout << ConcatStringList::refList.refCountsString() << endl;
+    cout << ConcatStringList::delStrList.totalRefCountsString() << endl;
+
+    
+    cout << "---After deleting s5---" << endl;
+    delete s5;
+    cout << ConcatStringList::refList.refCountsString() << endl;
+    cout << ConcatStringList::delStrList.totalRefCountsString() << endl;
+    
+    cout << "---After deleting s1---" << endl;
+    delete s1;
+    cout << ConcatStringList::refList.refCountsString() << endl;
+    cout << ConcatStringList::delStrList.totalRefCountsString() << endl;
+    
+    cout << "---After deleting s3---" << endl;
+    delete s3;
+    cout << ConcatStringList::refList.refCountsString() << endl;
+    cout << ConcatStringList::delStrList.totalRefCountsString() << endl;
+}
+
+void tc32() {
+    ConcatStringList * s1 = new ConcatStringList("Hello,");
+    ConcatStringList * s2 = new ConcatStringList("_this_is");
+    ConcatStringList * s3 = new ConcatStringList("_an_assignment");
+    ConcatStringList * s4 = new ConcatStringList(s1->concat(*s2));
+    ConcatStringList * s5 = new ConcatStringList(s2->concat(*s3));
+    cout << ConcatStringList::refList.refCountsString() << endl;
+    cout << ConcatStringList::delStrList.totalRefCountsString() << endl;
+
+
+    cout << "---After deleting s2---" << endl;
+    delete s2;
+    cout << ConcatStringList::refList.refCountsString() << endl;
+    cout << ConcatStringList::delStrList.totalRefCountsString() << endl;
+
+    cout << "---After deleting s4---" << endl;
+    delete s4;
+    cout << ConcatStringList::refList.refCountsString() << endl;
+    cout << ConcatStringList::delStrList.totalRefCountsString() << endl;
+
+    
+    cout << "---After deleting s5---" << endl;
+    delete s5;
+    cout << ConcatStringList::refList.refCountsString() << endl;
+    cout << ConcatStringList::delStrList.totalRefCountsString() << endl;
+    
+    cout << "---After deleting s1---" << endl;
+    delete s1;
+    cout << ConcatStringList::refList.refCountsString() << endl;
+    cout << ConcatStringList::delStrList.totalRefCountsString() << endl;
+    
+    cout << "---After deleting s3---" << endl;
+    delete s3;
+    cout << ConcatStringList::refList.refCountsString() << endl;
+    cout << ConcatStringList::delStrList.totalRefCountsString() << endl;
+}
 int main() {
-    tc2();
+    tc24();
     return 0;
 }
