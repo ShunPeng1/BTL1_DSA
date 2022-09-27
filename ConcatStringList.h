@@ -13,17 +13,30 @@ struct CharALNode{
     }
 };
 
-struct RefCharALNode{
-    RefCharALNode * next;
+struct RefNode{
+    RefNode * next;
     CharALNode * original;
     int nReference ;
-    RefCharALNode(RefCharALNode * _next, CharALNode * _original, int _nRef){ 
+    RefNode(RefNode * _next, CharALNode * _original, int _nRef){ 
         next = _next; 
         original = _original;
         nReference = _nRef;
     }
 };
 
+struct DelNode{
+    DelNode * next;
+    CharALNode * headCALN;
+    CharALNode * tailCALN;
+    RefNode * refNode ;
+
+    DelNode(DelNode *_next, CharALNode *_headCALN, CharALNode *_tailCALN, RefNode * _refNode){
+        next=_next;
+        headCALN = _headCALN;
+        tailCALN = _tailCALN;
+        refNode = _refNode;
+    }
+};
 
 class ConcatStringList {
 private:
@@ -47,33 +60,40 @@ public:
     ConcatStringList concat(const ConcatStringList & otherS) const;
     ConcatStringList subString(int from, int to) const;
     ConcatStringList reverse() const;
+    void deleteNodeBycheckingRef();
+    void DeleteNode();
     ~ConcatStringList();
 
 
 public:
     class ReferencesList {
         // TODO: may provide some attributes
-        RefCharALNode *headRef =nullptr, *tailRef= nullptr;
+        RefNode *headRef =nullptr, *tailRef= nullptr;
         int nNodeRef = 0;
 
         friend class ConcatStringList;
-
+        friend class DeleteStringList;
         public:
             
             int size() const;
             int refCountAt(int index) const;
             std::string refCountsString() const;
 
-            //RefCharALNode * getHead();
-            void printRef();
-            void addBackRefNode(CharALNode* , int );
+            //RefNode * getHead();
+            void printRefDebug();
+            void addFrontRefNode(CharALNode* , int );
             void increaseNumberOfReferenceAt(CharALNode *, int);
             void sortRef();
-            bool compareRef(RefCharALNode *, RefCharALNode *);
+            bool compareRef(RefNode *, RefNode *);
     };
 
     class DeleteStringList {
         // TODO: may provide some attributes
+        DelNode *headDel =nullptr, *tailDel= nullptr;
+        int nNodeDel = 0;
+
+        friend class ConcatStringList;
+        friend class ReferencesList;
 
         public:
             int size() const;

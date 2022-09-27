@@ -11,81 +11,92 @@ typedef long long ll;
 
 #define FOR(i,a,n) for(ll i=a ; i<n ; i++)
 #define FORR(i,n,a) for(ll i=a-1 ; i>=n ; i--)
-#define FOREACH(x, c) for(auto &(x): (c) )
+#define FOREACH(x, c) for(auto &(x): (c) ) 
 
 #define endl '\n'
 #define ENDL cout<<'\n'
 #define YES cout<<"YES"
 #define NO cout<<"NO"
 
+//typedef all the class because it is long af
+
+typedef ConcatStringList CSL;
+typedef CharALNode CALN;
 typedef CharALNode * pCALN;
-typedef RefCharALNode * pRCALN;
 
-ConcatStringList::ReferencesList ConcatStringList::refList = ConcatStringList::ReferencesList();
-ConcatStringList::DeleteStringList ConcatStringList::delStrList = ConcatStringList::DeleteStringList();
+typedef ConcatStringList::DeleteStringList DL;
+typedef DelNode DN;
+typedef DelNode * pDN;
 
-ConcatStringList::ConcatStringList(){
+typedef ConcatStringList::ReferencesList RL;
+typedef RefNode RN;
+typedef RefNode * pRN;
+
+RL CSL::refList = RL();
+DL CSL::delStrList = DL();
+
+CSL::ConcatStringList(){
     nChar = 0;
     nNode = 0;
     head = nullptr;
     tail = nullptr;
 }
 
-ConcatStringList::ConcatStringList(const char * s){
+CSL::ConcatStringList(const char * s){
     int i = 0;
-    string temp = "";
+    string tp = "";
     while(s[i]!='\0'){
-        temp+=s[i];
+        tp+=s[i];
         i++;
     }
 
-    pCALN tempCALN = new CharALNode(s,nullptr);
-    head = tempCALN;
-    tail = tempCALN;
+    pCALN tpCALN = new CALN(s,nullptr);
+    head = tpCALN;
+    tail = tpCALN;
 
     nChar = i;
     nNode =1;
     
     //Reference
-    refList.addBackRefNode(tempCALN, 2);
+    refList.addFrontRefNode(tpCALN, 2);
     //
 }
 
-int ConcatStringList::length() const{
+int CSL::length() const{
     return nChar;
 }
 
-char ConcatStringList::get(int index) const{
+char CSL::get(int index) const{
     if(index<0||index>=nChar){
         throw out_of_range("Index of string is invalid!");
     }
 
-    int tempSize=0;
+    int tpSize=0;
     pCALN roam = head;
     while(roam){
-        if(index<tempSize+roam->CharArrayList.size()){
-            return roam->CharArrayList[index-tempSize];
+        if(index<tpSize+roam->CharArrayList.size()){
+            return roam->CharArrayList[index-tpSize];
         }
-        tempSize+= roam->CharArrayList.size();
+        tpSize+= roam->CharArrayList.size();
         roam = roam->next;
     }
     return '\0';
 }
 
-int ConcatStringList::indexOf(char c) const{
-    int tempSize=0;
+int CSL::indexOf(char c) const{
+    int tpSize=0;
     pCALN roam = head;
     while(roam!=nullptr){
         FOR(i,0,roam->CharArrayList.size()){
-            if(c==roam->CharArrayList[i]) return tempSize+i;
+            if(c==roam->CharArrayList[i]) return tpSize+i;
         }
-        tempSize+= roam->CharArrayList.size();
+        tpSize+= roam->CharArrayList.size();
         roam = roam->next;
     }
     return -1;
 }
 
-string ConcatStringList::toString() const{
+string CSL::toString() const{
     string output ="";
     pCALN roam = head;
     while(roam!=tail->next){
@@ -96,33 +107,26 @@ string ConcatStringList::toString() const{
     return output;
 }
 
-ConcatStringList ConcatStringList::concat(const ConcatStringList & otherS) const{
+CSL CSL::concat(const CSL & otherS) const{
     
     tail->next = otherS.head;
     
-    ConcatStringList nObj;
+    CSL nObj;
     nObj.head = head;
     nObj.tail = otherS.tail;
     nObj.nNode = nNode + otherS.nNode;
     nObj.nChar = nChar + otherS.nChar;
     
-    //Reference 
-    pCALN roam = nObj.head;
-    while(roam->next){
-        roam = roam->next;
-    }
-
-    refList.increaseNumberOfReferenceAt(nObj.head, 1);
-    refList.increaseNumberOfReferenceAt(roam, 1);
+    //Reference List
+    refList.increaseNumberOfReferenceAt(head, 1);
+    refList.increaseNumberOfReferenceAt(otherS.tail, 1);
     //
 
-    return std::move(nObj);
+    return nObj;
 }
 
-
-
-ConcatStringList ConcatStringList::subString(int from, int to) const{
-    if(from <0 || to>=nChar){
+CSL CSL::subString(int from, int to) const{
+    if(from <0 || to>nChar){
         throw out_of_range("Index of string is invalid");
     }
 
@@ -130,39 +134,39 @@ ConcatStringList ConcatStringList::subString(int from, int to) const{
         throw logic_error("Invalid range");
     }
     
-    ConcatStringList result;
+    CSL result;
     result.nChar = to-from;
 
     pCALN roam = head;
-    int tempSize = 0;
-    while(roam!=nullptr){
+    int tpSize = 0;
+    while(roam!=tail->next){
         
-        string tempStr = "";
+        string tpStr = "";
         FOR(i,0,roam->CharArrayList.size()){
-            int currentPos = tempSize + i;
+            int currentPos = tpSize + i;
             if(currentPos>= from && currentPos<to){
-                tempStr += roam->CharArrayList[i];
+                tpStr += roam->CharArrayList[i];
             }
         }
-        if(tempStr.size()){
-            pCALN tempCALN = new CharALNode(tempStr, nullptr);
+        if(tpStr.size()){
+            pCALN tpCALN = new CALN(tpStr, nullptr);
             result.nNode++;
             
             //Reference Add
-            refList.addBackRefNode(tempCALN, 0);
+            refList.addFrontRefNode(tpCALN, 0);
             
             if(result.head == nullptr){
-                result.head = tempCALN;
-                result.tail = tempCALN;
+                result.head = tpCALN;
+                result.tail = tpCALN;
             }
             else {
-                result.tail->next = tempCALN;
+                result.tail->next = tpCALN;
                 result.tail = result.tail->next;
             }
 
         }
 
-        tempSize+= roam->CharArrayList.size();
+        tpSize+= roam->CharArrayList.size();
         roam = roam->next;
     }
 
@@ -174,37 +178,37 @@ ConcatStringList ConcatStringList::subString(int from, int to) const{
     return result;
 }
 
-ConcatStringList ConcatStringList::reverse() const{
-    ConcatStringList result;
+CSL CSL::reverse() const{
+    CSL result;
     result.nNode = nNode;
     result.nChar = nChar;
 
     pCALN roam = head;
-    int tempSize = 0;
-    while(roam!=nullptr){
+    int tpSize = 0;
+    while(roam!=tail->next){
         
-        string tempStr = "";
+        string tpStr = "";
         FORR(i,0,roam->CharArrayList.size()){
-            tempStr += roam->CharArrayList[i];
+            tpStr += roam->CharArrayList[i];
         }
 
-        if(tempStr.size()){
-            pCALN tempCALN = new CharALNode(tempStr, nullptr);
+        if(tpStr.size()){
+            pCALN tpCALN = new CharALNode(tpStr, nullptr);
 
             //Reference Add
-            refList.addBackRefNode(tempCALN, 0);
+            refList.addFrontRefNode(tpCALN, 0);
 
             if(result.tail == nullptr){
-                result.head = tempCALN;
-                result.tail = tempCALN;
+                result.head = tpCALN;
+                result.tail = tpCALN;
             }
             else {
-                tempCALN->next = result.head;
-                result.head = tempCALN;
+                tpCALN->next = result.head;
+                result.head = tpCALN;
             }
         }
 
-        tempSize+= roam->CharArrayList.size();
+        tpSize+= roam->CharArrayList.size();
         roam = roam->next;
     }
     
@@ -216,42 +220,47 @@ ConcatStringList ConcatStringList::reverse() const{
     return result;
 }
 
-ConcatStringList::~ConcatStringList(){
-    // pCALN roam = head;
-    // while(roam!=nullptr){
-    //     pCALN temp = roam->next;
-    //     delete roam;
-    //     roam = temp;
-    // }
+//Destructor section
+
+CSL::~ConcatStringList(){
+    //deleteNodeBycheckingRef();
+    
+}
+
+void CSL::deleteNodeBycheckingRef(){
+    refList.increaseNumberOfReferenceAt(head, -1);
+    refList.increaseNumberOfReferenceAt(tail, -1);
+
+
 }
 
 //References List Function
 
-int ConcatStringList::ReferencesList::size() const{
+int RL::size() const{
     return nNodeRef;
 }
 
-int ConcatStringList::ReferencesList::refCountAt(int index) const{
+int RL::refCountAt(int index) const{
     if(index<0||index>=nNodeRef){
         throw out_of_range("Index of references list is invalid!");
     }
     
-    pRCALN roam = headRef;
-    int tempSize = 0;
+    pRN roam = headRef;
+    int tpSize = 0;
     while(roam!=nullptr){
-        if(tempSize == index){
+        if(tpSize == index){
             return roam->nReference;
         }
-        tempSize++;
+        tpSize++;
         roam = roam->next;
     }
     
     return 0;
 }
 
-string ConcatStringList::ReferencesList::refCountsString() const{
+string RL::refCountsString() const{
     string res = "RefCounts[";
-    pRCALN roam = headRef;
+    pRN roam = headRef;
     
     while(roam!=nullptr){   
         res+= to_string(roam->nReference);
@@ -263,9 +272,9 @@ string ConcatStringList::ReferencesList::refCountsString() const{
 }
 
 
-//Adding More Utility Functions
-void ConcatStringList::ReferencesList::printRef(){
-    pRCALN roam = headRef ;
+//Reference List Additional Function
+void RL::printRefDebug(){
+    pRN roam = headRef ;
     while(roam){
         cout<<roam->original->CharArrayList<<" "<<roam->nReference<<"\n | \n V \n";
         roam = roam->next;
@@ -273,41 +282,46 @@ void ConcatStringList::ReferencesList::printRef(){
 
 }
 
-void ConcatStringList::ReferencesList::addBackRefNode(pCALN tempCALN, int nRef){
-    pRCALN tempNode = new RefCharALNode(nullptr,tempCALN,nRef); 
+void RL::addFrontRefNode(pCALN tpCALN, int nRef){
+    pRN tpNode = new RN(nullptr,tpCALN,nRef); 
 
     if(nNodeRef == 0){
-        headRef = tempNode ;
-        tailRef = tempNode ;
+        headRef = tpNode ;
+        tailRef = tpNode ;
     }
     else{
-        tailRef->next = tempNode;
-        tailRef = tailRef->next; 
+        //Add back
+        //tailRef->next = tpNode;
+        //tailRef = tailRef->next; 
+
+        //Add front
+        tpNode->next = headRef;
+        headRef = tpNode;
     }
     nNodeRef++;
 }
 
-void ConcatStringList::ReferencesList::increaseNumberOfReferenceAt(pCALN tempCALN, int value){
-    pRCALN roam2 = refList.headRef;
-    while (roam2){
-        if(roam2->original == tempCALN){
-            roam2->nReference+= value;
+void RL::increaseNumberOfReferenceAt(pCALN tpCALN, int value){
+    pRN roam = refList.headRef;
+    while (roam){
+        if(roam->original == tpCALN){
+            roam->nReference+= value;
             break;
         }
-        roam2 = roam2->next;
+        roam = roam->next;
     }
 }
 
-void ConcatStringList::ReferencesList::sortRef(){
+void RL::sortRef(){
     return ;
-    // pRCALN roam1 = headRef;
-    // pRCALN roam2 = headRef;
+    // pRN roam1 = headRef;
+    // pRN roam2 = headRef;
     // FOR(i,0, refList.size()){
     //     FOR(j,0, refList.size()-1){
     //         if (roam1->data < roam2->data) {
-    //             int temp = roam1->data;
+    //             int tp = roam1->data;
     //             roam1->data = roam2->data;
-    //             roam2->data = temp;
+    //             roam2->data = tp;
 
     //         }
     //         roam2 = roam2->next;
@@ -321,6 +335,28 @@ void ConcatStringList::ReferencesList::sortRef(){
 
 }
 
-bool ConcatStringList::ReferencesList::compareRef(pRCALN first, pRCALN second){
+bool RL::compareRef(pRN first, pRN second){
     return true;
 }
+
+
+//Delete List Function
+int DL::size() const{
+    return nNodeDel;
+}
+
+string DL::totalRefCountsString() const{
+    string res = "TotalRefCounts[";
+    pDN roam = headDel;
+    
+    while(roam!=nullptr){   
+        res+= to_string(roam->refNode->nReference);
+        roam = roam->next;
+        if(roam!= nullptr) res+=',';
+    }
+    res+= "]";
+    return res;
+}
+
+
+//Delete List Additional Fuction
