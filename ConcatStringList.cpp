@@ -56,7 +56,7 @@ CSL::ConcatStringList(const char * s){
     
     //Reference
     refList.addFrontRefNode(tpCALN, 2);
-    //refList.sortRef();
+    refList.sortRef();
     //
 }
 
@@ -118,7 +118,7 @@ CSL CSL::concat(const CSL & otherS) const{
     //Reference List
     refList.increaseNumOfRefAt(head, 1);
     refList.increaseNumOfRefAt(otherS.tail, 1);
-    //refList.sortRef();
+    refList.sortRef();
     //
 
     return nObj;
@@ -172,7 +172,7 @@ CSL CSL::subString(int from, int to) const{
     //Reference increase
     refList.increaseNumOfRefAt(result.head, 1);
     refList.increaseNumOfRefAt(result.tail, 1);
-    //refList.sortRef();
+    refList.sortRef();
     //
     return result;
 }
@@ -214,7 +214,7 @@ CSL CSL::reverse() const{
     //Reference increase
     refList.increaseNumOfRefAt(result.head, 1);
     refList.increaseNumOfRefAt(result.tail, 1);
-    //refList.sortRef();
+    refList.sortRef();
     //
     return result;
 }
@@ -233,8 +233,7 @@ CSL::~ConcatStringList(){
     refList.DeleteIfAll0();
 }
 
-void CSL::deleteNodeBycheckingRef(){
-}
+
 
 //References List Function
 
@@ -323,7 +322,8 @@ RN * RL::getRNPointer(CALN * tpCALN){
         }
         roam = roam->next;
     }
-    throw logic_error("No RefNode found BUG!");
+    //throw logic_error("No RefNode found BUG!");
+    return nullptr;
 }
 
 
@@ -368,6 +368,9 @@ bool RL::compareRef(RN* first, RN* second){
     if(first->nReference == 0){
         return true;
     }
+    if(second->nReference == 0){
+        return false;
+    }
     if(first->nReference>second->nReference){
         return true;
     }
@@ -392,7 +395,6 @@ void RL::DeleteIfAll0(){
     }
     headRef = nullptr;
     tailRef = nullptr;
-
     
 }
 
@@ -432,6 +434,7 @@ void DL::addBackDelNode(DN * tpDN){
         tailDel->next = tpDN;
         tailDel = tpDN;
     }
+    nNodeDel++;
 }
 
 void DL::loopToDeallocateNode(){
@@ -445,6 +448,7 @@ void DL::loopToDeallocateNode(){
         headDel = headDel->next;
         
         deleteCharALNode(tp);
+        nNodeDel--;
         delete tp;
     }
     DN * curr  = headDel ,  *prev = nullptr;
@@ -457,6 +461,7 @@ void DL::loopToDeallocateNode(){
             curr = curr->next;
         
             deleteCharALNode(tp);
+            nNodeDel--;
             delete tp;
         }
         else{
@@ -488,7 +493,7 @@ void DL::deleteCharALNode(DN * tpDN){
         RN * tpRN =refList.getRNPointer(tpCALN);
         roamHead = roamHead->next;
 
-        if(!tpRN->isDeleted ){
+        if(!tpRN) if(!tpRN->isDeleted ){
             tpRN->isDeleted = true;
             delete tpCALN;
         }

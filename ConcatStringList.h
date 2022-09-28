@@ -61,7 +61,6 @@ public:
     ConcatStringList concat(const ConcatStringList & otherS) const;
     ConcatStringList subString(int from, int to) const;
     ConcatStringList reverse() const;
-    void deleteNodeBycheckingRef();
     void DeleteNode();
     ~ConcatStringList();
 
