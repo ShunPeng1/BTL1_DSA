@@ -22,19 +22,18 @@ struct RefNode{
         original = _original;
         nReference = _nRef;
     }
+    
 };
 
 struct DelNode{
     DelNode * next;
-    CharALNode * headCALN;
-    CharALNode * tailCALN;
-    RefNode * refNode ;
+    RefNode * headRN;
+    RefNode * tailRN;
 
-    DelNode(DelNode *_next, CharALNode *_headCALN, CharALNode *_tailCALN, RefNode * _refNode){
+    DelNode(DelNode *_next, RefNode *_headRN, RefNode *_tailRN){
         next=_next;
-        headCALN = _headCALN;
-        tailCALN = _tailCALN;
-        refNode = _refNode;
+        headRN = _headRN;
+        tailRN = _tailRN;
     }
 };
 
@@ -79,10 +78,11 @@ public:
             int refCountAt(int index) const;
             std::string refCountsString() const;
 
-            //RefNode * getHead();
+            //Reference Additional Function
             void printRefDebug();
             void addFrontRefNode(CharALNode* , int );
-            void increaseNumberOfReferenceAt(CharALNode *, int);
+            void increaseNumOfRefAt(CharALNode *, int);
+            RefNode * getRNPointer(CharALNode *);
             void sortRef();
             bool compareRef(RefNode *, RefNode *);
     };
@@ -98,6 +98,13 @@ public:
         public:
             int size() const;
             std::string totalRefCountsString() const;
+
+            //Delete Additional Function
+            
+            int sumHeadAndTailNumOfRef(DelNode *) const;
+            void addBackDelNode(DelNode* );
+            void loopToDeallocateNode();
+            void deleteCharALNode(DelNode *);
     };
 };
 
