@@ -343,7 +343,7 @@ void tc32() {
     cout << ConcatStringList::delStrList.totalRefCountsString() << endl;
 }
 int main() {
-    tc3();
+    tc1();
 
     return 0;
 }

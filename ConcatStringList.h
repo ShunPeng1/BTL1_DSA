@@ -17,10 +17,12 @@ struct RefNode{
     RefNode * next;
     CharALNode * original;
     int nReference ;
+    bool isDeleted;
     RefNode(RefNode * _next, CharALNode * _original, int _nRef){ 
         next = _next; 
         original = _original;
         nReference = _nRef;
+        isDeleted = false;
     }
     
 };
@@ -85,6 +87,7 @@ public:
             RefNode * getRNPointer(CharALNode *);
             void sortRef();
             bool compareRef(RefNode *, RefNode *);
+            void DeleteIfAll0();
     };
 
     class DeleteStringList {

@@ -56,6 +56,7 @@ CSL::ConcatStringList(const char * s){
     
     //Reference
     refList.addFrontRefNode(tpCALN, 2);
+    //refList.sortRef();
     //
 }
 
@@ -117,6 +118,7 @@ CSL CSL::concat(const CSL & otherS) const{
     //Reference List
     refList.increaseNumOfRefAt(head, 1);
     refList.increaseNumOfRefAt(otherS.tail, 1);
+    //refList.sortRef();
     //
 
     return nObj;
@@ -168,10 +170,10 @@ CSL CSL::subString(int from, int to) const{
     }
 
     //Reference increase
-
     refList.increaseNumOfRefAt(result.head, 1);
     refList.increaseNumOfRefAt(result.tail, 1);
-
+    //refList.sortRef();
+    //
     return result;
 }
 
@@ -210,21 +212,16 @@ CSL CSL::reverse() const{
     }
     
     //Reference increase
-
     refList.increaseNumOfRefAt(result.head, 1);
     refList.increaseNumOfRefAt(result.tail, 1);
-
+    //refList.sortRef();
+    //
     return result;
 }
 
 //Destructor section
 
 CSL::~ConcatStringList(){
-    deleteNodeBycheckingRef();
-    
-}
-
-void CSL::deleteNodeBycheckingRef(){
     refList.increaseNumOfRefAt(head, -1);
     refList.increaseNumOfRefAt(tail, -1);
 
@@ -232,6 +229,11 @@ void CSL::deleteNodeBycheckingRef(){
         new DelNode(nullptr, refList.getRNPointer(head) ,refList.getRNPointer(tail)));
     
     delStrList.loopToDeallocateNode();
+    refList.sortRef();
+    refList.DeleteIfAll0();
+}
+
+void CSL::deleteNodeBycheckingRef(){
 }
 
 //References List Function
@@ -259,6 +261,7 @@ int RL::refCountAt(int index) const{
 }
 
 string RL::refCountsString() const{
+
     string res = "RefCounts[";
     RN* roam = headRef;
     
@@ -323,33 +326,75 @@ RN * RL::getRNPointer(CALN * tpCALN){
     throw logic_error("No RefNode found BUG!");
 }
 
-void RL::sortRef(){
-    return ;
-    // pRN roam1 = headRef;
-    // pRN roam2 = headRef;
-    // FOR(i,0, refList.size()){
-    //     FOR(j,0, refList.size()-1){
-    //         if (roam1->data < roam2->data) {
-    //             int tp = roam1->data;
-    //             roam1->data = roam2->data;
-    //             roam2->data = tp;
 
-    //         }
-    //         roam2 = roam2->next;
-    //     }
-    //     roam2 = headRef;
-    //     roam1 = headRef->next;
-    //     FOR(k,0, i){
-    //         roam1 = roam1->next;
-    //     }
-    // }
+void RL::sortRef(){
+    //copy from https://www.javatpoint.com/program-to-sort-the-elements-of-the-singly-linked-list
+    //Node currRN will point to head  
+    RN *currRN = headRef, *nextRN = nullptr, *prevRN = nullptr;  
+
+
+    if(headRef == nullptr) {  
+        return;  
+    }  
+    else {  
+        while(currRN != tailRef->next) {  
+            //Node nextRN will point to node next to currRN  
+            nextRN = currRN->next;  
+                
+            while(nextRN != nullptr) {  
+                //If currRN node's data is greater than nextRN's node data, swap the data between them  
+                if(compareRef(currRN, nextRN)){
+                    // swap(currRN->nReference, nextRN->nReference);
+                    // swap(currRN->isDeleted, nextRN->isDeleted);
+                    // swap(currRN->original, nextRN->original);
+
+                    currRN->next = nextRN->next;
+                    nextRN->next = currRN;
+                    if(prevRN) prevRN->next = nextRN;
+                    if(headRef == currRN) headRef = nextRN;
+                    if(tailRef == nextRN) tailRef = currRN;
+                    swap(currRN,nextRN);
+                }
+                nextRN = nextRN->next;  
+            }  
+            prevRN = currRN;
+            currRN = currRN->next;  
+        }      
+    }  
 
 }
 
 bool RL::compareRef(RN* first, RN* second){
-    return true;
+    if(first->nReference == 0){
+        return true;
+    }
+    if(first->nReference>second->nReference){
+        return true;
+    }
+    return false;
 }
 
+void RL::DeleteIfAll0(){
+    RN *roam = headRef;
+    int sum = 0;
+    while(roam){
+        sum+= roam->nReference;
+        roam=roam->next;
+    }
+    if(sum) return;
+
+    roam = headRef;
+    while (roam)
+    {
+        RN* tp = roam;
+        roam = roam->next;
+        delete tp; 
+    }
+    headRef = nullptr;
+    tailRef = nullptr;
+
+    
+}
 
 //Delete List Function
 int DL::size() const{
@@ -372,6 +417,9 @@ string DL::totalRefCountsString() const{
 
 //Delete List Additional Fuction
 int DL::sumHeadAndTailNumOfRef(DN* tpDN) const{
+    if(tpDN->headRN == tpDN->tailRN){
+        return tpDN->headRN->nReference;
+    }
     return tpDN->headRN->nReference + tpDN->tailRN->nReference;
 }
 
@@ -418,6 +466,11 @@ void DL::loopToDeallocateNode(){
     }
 
     //assign tail
+    if(!headDel){
+        tailDel = nullptr;
+        return ;
+    }
+    
     curr = headDel ;
     while(curr->next){
         curr = curr->next;
@@ -428,11 +481,16 @@ void DL::loopToDeallocateNode(){
 
 
 void DL::deleteCharALNode(DN * tpDN){
-    CALN * roamHead = tpDN->headRN->original , * roamTail = tpDN->tailRN->original;
+    CALN * roamHead = tpDN->headRN->original , * roamTail = tpDN->tailRN->original->next;
 //roamtail next not null
-    while(roamHead != roamTail->next){
-        CALN * tp = roamHead;
+    while(roamHead != roamTail){
+        CALN * tpCALN = roamHead;
+        RN * tpRN =refList.getRNPointer(tpCALN);
         roamHead = roamHead->next;
-        delete tp;
+
+        if(!tpRN->isDeleted ){
+            tpRN->isDeleted = true;
+            delete tpCALN;
+        }
     }
 }
