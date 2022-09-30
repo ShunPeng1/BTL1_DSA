@@ -16,11 +16,13 @@ struct CharALNode{
 struct RefNode{
     RefNode * next;
     CharALNode * original;
+    RefNode * originalNext;
     int nReference ;
     bool isDeleted;
-    RefNode(RefNode * _next, CharALNode * _original, int _nRef){ 
+    RefNode(RefNode * _next, CharALNode * _original, RefNode * _originalNext, int _nRef){ 
         next = _next; 
         original = _original;
+        originalNext = _originalNext;
         nReference = _nRef;
         isDeleted = false;
     }
@@ -29,13 +31,23 @@ struct RefNode{
 
 struct DelNode{
     DelNode * next;
-    RefNode * headRN;
-    RefNode * tailRN;
-
-    DelNode(DelNode *_next, RefNode *_headRN, RefNode *_tailRN){
+    RefNode **chainRN;
+    int nChainRN;
+    DelNode(DelNode *_next, RefNode *_headRN, RefNode *_tailRN, int length){
         next=_next;
-        headRN = _headRN;
-        tailRN = _tailRN;
+        nChainRN = length;
+        //array of RefNode to traverse in DeleteCALN
+        chainRN = new RefNode*[length];
+        for(int i = 0 ; i< length ; i++){
+            chainRN[i] = _headRN;
+            _headRN = _headRN->originalNext;
+        }
+        if(_headRN!= _tailRN->originalNext){
+            throw logic_error("DelNode: Concat nNode struct size is wrong");
+        }
+    }
+    ~DelNode(){
+        delete [] chainRN;
     }
 };
 
@@ -81,7 +93,7 @@ public:
 
             //Reference Additional Function
             void printRefDebug();
-            void addFrontRefNode(CharALNode* , int );
+            RefNode* addFrontRefNode(CharALNode* , int );
             void increaseNumOfRefAt(CharALNode *, int);
             RefNode * getRNPointer(CharALNode *);
             void sortRef();
@@ -104,7 +116,7 @@ public:
             //Delete Additional Function
             
             int sumHeadAndTailNumOfRef(DelNode *) const;
-            void addBackDelNode(DelNode* );
+            void addBackDelNode(DelNode*& );
             void loopToDeallocateNode();
             void deleteCharALNode(DelNode *);
     };
