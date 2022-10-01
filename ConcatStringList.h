@@ -7,25 +7,16 @@
 struct CharALNode{
     CharALNode * next;
     string CharArrayList;
-    CharALNode(string s, CharALNode * _next){ 
-        next = _next; 
-        CharArrayList = s;
-    }
+
+    CharALNode(string s, CharALNode * _next);
 };
 
 struct RefNode{
     RefNode * next;
     CharALNode * original;
-    RefNode * originalNext;
     int nReference ;
     bool isDeleted;
-    RefNode(RefNode * _next, CharALNode * _original, RefNode * _originalNext, int _nRef){ 
-        next = _next; 
-        original = _original;
-        originalNext = _originalNext;
-        nReference = _nRef;
-        isDeleted = false;
-    }
+    RefNode(RefNode * _next, CharALNode * _original, int _nRef);
     
 };
 
@@ -33,22 +24,8 @@ struct DelNode{
     DelNode * next;
     RefNode **chainRN;
     int nChainRN;
-    DelNode(DelNode *_next, RefNode *_headRN, RefNode *_tailRN, int length){
-        next=_next;
-        nChainRN = length;
-        //array of RefNode to traverse in DeleteCALN
-        chainRN = new RefNode*[length];
-        for(int i = 0 ; i< length ; i++){
-            chainRN[i] = _headRN;
-            _headRN = _headRN->originalNext;
-        }
-        if(_headRN!= _tailRN->originalNext){
-            throw logic_error("DelNode: Concat nNode struct size is wrong");
-        }
-    }
-    ~DelNode(){
-        delete [] chainRN;
-    }
+    DelNode(DelNode *_next, CharALNode* headCALN, CharALNode* tailCALN, int length);
+    ~DelNode();
 };
 
 class ConcatStringList {
@@ -60,12 +37,14 @@ public:
     class ReferencesList; // forward declaration
     class DeleteStringList; // forward declaration
 
+
     static ReferencesList refList;
     static DeleteStringList delStrList;
 
 
     ConcatStringList();
     ConcatStringList(const char *s);
+    ConcatStringList(const ConcatStringList & tpCALN);
     int length() const;
     char get(int index) const;
     int indexOf(char c) const;
@@ -93,7 +72,7 @@ public:
 
             //Reference Additional Function
             void printRefDebug();
-            RefNode* addFrontRefNode(CharALNode* , int );
+            void addFrontRefNode(CharALNode* , int );
             void increaseNumOfRefAt(CharALNode *, int);
             RefNode * getRNPointer(CharALNode *);
             void sortRef();
