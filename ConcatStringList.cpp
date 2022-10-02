@@ -168,7 +168,7 @@ CSL CSL::subString(int from, int to) const{
         throw out_of_range("Index of string is invalid");
     }
 
-    if(from>to){
+    if(from>=to){
         throw logic_error("Invalid range");
     }
     
@@ -191,7 +191,7 @@ CSL CSL::subString(int from, int to) const{
             result.nNode++;
             
             //Reference Add
-            refList.addFrontRefNode(tpCALN, 0);
+            //refList.addFrontRefNode(tpCALN, 0);
 
             if(result.head == nullptr){
                 result.head = tpCALN;
@@ -209,8 +209,15 @@ CSL CSL::subString(int from, int to) const{
     }
 
     //Reference increase
-    refList.increaseNumOfRefAt(result.head, 1);
-    refList.increaseNumOfRefAt(result.tail, 1);
+    if(result.nNode == 1){
+        refList.addFrontRefNode(result.head,2);
+    }
+    else{
+        refList.addFrontRefNode(result.head, 1);
+        refList.addFrontRefNode(result.tail, 1);
+    }
+    //refList.increaseNumOfRefAt(result.head, 1);
+    //refList.increaseNumOfRefAt(result.tail, 1);
     refList.sortRef();
     //
     return result;
@@ -234,7 +241,7 @@ CSL CSL::reverse() const{
             CALN* tpCALN = new CharALNode(tpStr, nullptr);
 
             //Reference Add
-            refList.addFrontRefNode(tpCALN, 0);
+            //refList.addFrontRefNode(tpCALN, 0);
 
             if(result.tail == nullptr){
                 result.head = tpCALN;
@@ -251,8 +258,15 @@ CSL CSL::reverse() const{
     }
     
     //Reference increase
-    refList.increaseNumOfRefAt(result.head, 1);
-    refList.increaseNumOfRefAt(result.tail, 1);
+    if(result.nNode == 1){
+        refList.addFrontRefNode(result.head,2);
+    }
+    else{
+        refList.addFrontRefNode(result.head, 1);
+        refList.addFrontRefNode(result.tail, 1);
+    }
+    //refList.increaseNumOfRefAt(result.head, 1);
+    //refList.increaseNumOfRefAt(result.tail, 1);
     refList.sortRef();
     //
     return result;
@@ -362,7 +376,7 @@ RN * RL::getRNPointer(CALN * tpCALN){
         }
         roam = roam->next;
     }
-    //throw logic_error("No RefNode found BUG!");
+    
     return nullptr;
 }
 
@@ -379,6 +393,7 @@ void RL::sortRef(){
 
     FOR(i,0,refList.size()){
         RN *currRN = headRef, *nextRN = headRef->next, *prevRN = nullptr;
+        bool isSorted = 1;
         while(nextRN != nullptr){
             if(compareRef(currRN, nextRN)){
                 currRN->next = nextRN->next;
@@ -393,12 +408,16 @@ void RL::sortRef(){
                 currRN = nextRN;
                 nextRN = tpRN;
 
+                isSorted = 0;
             }
             prevRN = currRN;
             currRN = currRN->next;
             nextRN = nextRN->next;
 
             
+        }
+        if(isSorted){
+            break;
         }
     }
 }
@@ -460,6 +479,9 @@ string DL::totalRefCountsString() const{
 int DL::sumHeadAndTailNumOfRef(DN* tpDN) const{
     RN* headRN = tpDN->chainRN[0];
     RN* tailRN = tpDN->chainRN[tpDN->nChainRN-1];
+    // if(!headRN || !tailRN ){
+    //     return 0;
+    // }
     if(headRN == tailRN){
         return headRN->nReference;
     }
@@ -530,7 +552,8 @@ void DL::deleteCharALNode(DN * tpDN){
     
     FOR(i,0,tpDN->nChainRN){
         RN *tpRN = tpDN->chainRN[i];
-        if(!tpRN->isDeleted){
+
+        if(tpRN!= nullptr) if(!tpRN->isDeleted){
             delete (tpRN->original);
             tpRN->isDeleted= true;
         }
