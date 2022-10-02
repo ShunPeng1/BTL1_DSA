@@ -648,73 +648,7 @@ void tc28() {
     cout<<"End process\n";
 }
 
-
-void tc29(){
-    ConcatStringList* s1 = new ConcatStringList("ABC");
-    ConcatStringList* s2 = new ConcatStringList("DEF");
- 
-    cout << ConcatStringList::refList.size() << '\n';
-    cout << ConcatStringList::delStrList.size() << '\n';
-    cout << ConcatStringList::refList.refCountsString() << '\n';
-    cout << ConcatStringList::delStrList.totalRefCountsString() << '\n';
- 
-    ConcatStringList* s7 = new ConcatStringList(s1->concat(*s2));
-    cout << "After create s7 \n";
-    cout << s7->toString() << '\n';
-    cout << ConcatStringList::refList.size() << '\n';
-    cout << ConcatStringList::delStrList.size() << '\n';
-    cout << ConcatStringList::refList.refCountsString() << '\n';
-    cout << ConcatStringList::delStrList.totalRefCountsString() << '\n';
-    ConcatStringList* s8 = new ConcatStringList(s7->subString(1,5).subString(1,2));
-    cout << "After create s8 \n";
-    cout << s8->toString() << '\n';
-    cout << ConcatStringList::refList.size() << '\n';
-    cout << ConcatStringList::delStrList.size() << '\n';
-    cout << ConcatStringList::refList.refCountsString() << '\n';
-    cout << ConcatStringList::delStrList.totalRefCountsString() << '\n';
-    
-    delete s7;
-    cout << "After delete s7 \n";
-    cout << ConcatStringList::refList.size() << '\n';
-    cout << ConcatStringList::delStrList.size() << '\n';
-    cout << ConcatStringList::refList.refCountsString() << '\n';
-    cout << ConcatStringList::delStrList.totalRefCountsString() << '\n';
-
-    delete s8;
-    cout << "After delete s8 \n";
-    cout << ConcatStringList::refList.size() << '\n';
-    cout << ConcatStringList::delStrList.size() << '\n';
-    cout << ConcatStringList::refList.refCountsString() << '\n';
-    cout << ConcatStringList::delStrList.totalRefCountsString() << '\n';
-
-    
-    delete s2;
-    cout << "After delete s2 \n";
-    cout << ConcatStringList::refList.size() << '\n';
-    cout << ConcatStringList::delStrList.size() << '\n';
-    cout << ConcatStringList::refList.refCountsString() << '\n';
-    cout << ConcatStringList::delStrList.totalRefCountsString() << '\n';
-    
-    delete s1;
-    cout << "After delete s1 \n";
-    cout << ConcatStringList::refList.size() << '\n';
-    cout << ConcatStringList::delStrList.size() << '\n';
-    cout << ConcatStringList::refList.refCountsString() << '\n';
-    cout << ConcatStringList::delStrList.totalRefCountsString() << '\n';
-}
 int main() {
-    tc28    ();
-    //cout<<"Checking testcase 32\n";
-    //tc32();
-    // cout<<"Checking testcase 33\n";
-    // tc33();
-    // cout<<"Checking testcase 34\n";
-    // tc34();
-    // cout<<"Checking testcase 35\n";
-    // tc35();
-    // cout<<"Checking testcase 36\n";
-    // tc36();
-    //cout<<"Checking testcase 37\n";
-    //tc37();
+    tc28();
     return 0;
 }
