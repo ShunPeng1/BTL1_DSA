@@ -19,6 +19,24 @@ void tc1() {
     cout << "s1 toString: " << s1.toString() << endl;
 }
 
+void tc13(){
+    ConcatStringList * s1 = new ConcatStringList("Hello");
+    ConcatStringList * s2 = new ConcatStringList(s1->reverse());
+
+    cout << ConcatStringList::refList.refCountsString() << endl;
+    cout << ConcatStringList::delStrList.totalRefCountsString() << endl;
+
+    cout << "---After deleting s1---" << endl;
+    delete s1;
+    cout << ConcatStringList::refList.refCountsString() << endl;
+    cout << ConcatStringList::delStrList.totalRefCountsString() << endl;
+
+    cout << "---After deleting s2---" << endl;
+    delete s2;
+    cout << ConcatStringList::refList.refCountsString() << endl;
+    cout << ConcatStringList::delStrList.totalRefCountsString() << endl;
+}
+
 void tc2() {
     ConcatStringList s1("Hello,");
     ConcatStringList s2("_this_is");
@@ -649,6 +667,6 @@ void tc28() {
 }
 
 int main() {
-    tc28();
+    tc13();
     return 0;
 }

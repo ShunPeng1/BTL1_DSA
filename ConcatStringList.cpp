@@ -1,5 +1,7 @@
 #include "ConcatStringList.h"
 
+
+
 //ALL OF MY #DEFINE ARE FOR PERSONAL USE AND PREVENT PLAGIARISM TO SOME EXTENDS 
 
 typedef long long ll;
@@ -23,6 +25,11 @@ typedef long long ll;
 ConcatStringList::ReferencesList ConcatStringList::refList = ConcatStringList::ReferencesList();
 ConcatStringList::DeleteStringList ConcatStringList::delStrList = ConcatStringList::DeleteStringList();
 //struct Node
+CharALNode::CharALNode() {
+    next = nullptr;
+    CharArrayList = "";
+}
+
 CharALNode::CharALNode(string s, CharALNode* _next) {
     next = _next;
     CharArrayList = s;
@@ -57,9 +64,10 @@ DelNode::~DelNode() {
 ConcatStringList::ConcatStringList() {
     nChar = 0;
     nNode = 0;
+    isConcated = false;
+    isTemporary = false;
     head = nullptr;
     tail = nullptr;
-    isAllocated = false;
 }
 
 ConcatStringList::ConcatStringList(const char* s) {
@@ -76,12 +84,64 @@ ConcatStringList::ConcatStringList(const char* s) {
 
     nChar = i;
     nNode = 1;
-    isAllocated = false;
+    isConcated = false;
+    isTemporary = false;
 
     //Reference
     refList.addFrontRefNode(tpCALN, 2);
     refList.sortRef();
     //
+}
+
+ConcatStringList::ConcatStringList(const ConcatStringList & other) {
+    this->head = nullptr;
+    this->tail = nullptr;
+    this->isConcated = false;
+    this->isTemporary = false;
+    this->nChar = other.nChar;
+    this->nNode = other.nNode;
+
+    if (other.isConcated) {//is return from concat so we shallow copy
+        this->head = other.head;
+        this->tail = other.tail;
+        refList.increaseNumOfRefAt(this->head, 1);
+        refList.increaseNumOfRefAt(this->tail, 1);
+
+        refList.sortRef();
+    }
+    else {//is return from the reverse or substring so we deep copy
+        CharALNode* roam = other.head;
+        while (roam != other.tail->next) {
+            CharALNode* tpCALN = new CharALNode();
+            *tpCALN = *roam;
+            if (this->tail == nullptr) {
+                this->head = tpCALN;
+                this->tail = tpCALN;
+            }
+            else {
+                this->tail->next = tpCALN;
+                this->tail = this->tail->next;
+            }
+            roam = roam->next;
+        }
+        if (this->nNode == 1) {
+            refList.addFrontRefNode(this->head, 2);
+        }
+        else {
+            refList.addFrontRefNode(this->head, 1);
+            refList.addFrontRefNode(this->tail, 1);
+        }
+        refList.sortRef();
+
+        //Delete tvalue other
+        roam = other.head;
+        while (roam) {
+            CharALNode* tp = roam;
+            roam = roam->next;
+            delete tp;
+        }
+    }
+    
 }
 
 // ConcatStringList function
@@ -134,20 +194,14 @@ ConcatStringList ConcatStringList::concat(const ConcatStringList& otherS) const 
 
     tail->next = otherS.head;
 
-    ConcatStringList *nObj = new ConcatStringList();
-    nObj->head = head;
-    nObj->tail = otherS.tail;
-    nObj->nNode = nNode + otherS.nNode;
-    nObj->nChar = nChar + otherS.nChar;
-    nObj->isAllocated = true;
-
-    //Reference List
-    refList.increaseNumOfRefAt(head, 1);
-    refList.increaseNumOfRefAt(otherS.tail, 1);
-    refList.sortRef();
-    //
-
-    return *nObj;
+    ConcatStringList nObj;
+    nObj.head = head;
+    nObj.tail = otherS.tail;
+    nObj.nNode = nNode + otherS.nNode;
+    nObj.nChar = nChar + otherS.nChar;
+    nObj.isConcated = true;
+    nObj.isTemporary = true;
+    return nObj;
 }
 
 ConcatStringList ConcatStringList::subString(int from, int to) const {
@@ -159,9 +213,8 @@ ConcatStringList ConcatStringList::subString(int from, int to) const {
         throw logic_error("Invalid range");
     }
 
-    ConcatStringList *result = new ConcatStringList();
-    result->nChar = to - from;
-    result->isAllocated = true;
+    ConcatStringList result ;
+    result.nChar = to - from;
 
     CharALNode* roam = head;
     int tpSize = 0;
@@ -176,18 +229,18 @@ ConcatStringList ConcatStringList::subString(int from, int to) const {
         }
         if (tpStr.size()) {
             CharALNode* tpCALN = new CharALNode(tpStr, nullptr);
-            result->nNode++;
+            result.nNode++;
 
             //Reference Add
             //refList.addFrontRefNode(tpCALN, 0);
 
-            if (result->head == nullptr) {
-                result->head = tpCALN;
-                result->tail = tpCALN;
+            if (result.head == nullptr) {
+                result.head = tpCALN;
+                result.tail = tpCALN;
             }
             else {
-                result->tail->next = tpCALN;
-                result->tail = result->tail->next;
+                result.tail->next = tpCALN;
+                result.tail = result.tail->next;
             }
 
         }
@@ -196,26 +249,14 @@ ConcatStringList ConcatStringList::subString(int from, int to) const {
         roam = roam->next;
     }
 
-    //Reference increase
-    if (result->nNode == 1) {
-        refList.addFrontRefNode(result->head, 2);
-    }
-    else {
-        refList.addFrontRefNode(result->head, 1);
-        refList.addFrontRefNode(result->tail, 1);
-    }
-    //refList.increaseNumOfRefAt(result.head, 1);
-    //refList.increaseNumOfRefAt(result.tail, 1);
-    refList.sortRef();
-    //
-    return *result;
+    result.isTemporary = true;
+    return result;
 }
 
 ConcatStringList ConcatStringList::reverse() const {
-    ConcatStringList *result= new ConcatStringList();
-    result->nNode = nNode;
-    result->nChar = nChar;
-    result->isAllocated = true;
+    ConcatStringList result;
+    result.nNode = nNode;
+    result.nChar = nChar;
 
     CharALNode* roam = head;
     int tpSize = 0;
@@ -232,13 +273,13 @@ ConcatStringList ConcatStringList::reverse() const {
             //Reference Add
             //refList.addFrontRefNode(tpCALN, 0);
 
-            if (result->tail == nullptr) {
-                result->head = tpCALN;
-                result->tail = tpCALN;
+            if (result.tail == nullptr) {
+                result.head = tpCALN;
+                result.tail = tpCALN;
             }
             else {
-                tpCALN->next = result->head;
-                result->head = tpCALN;
+                tpCALN->next = result.head;
+                result.head = tpCALN;
             }
         }
 
@@ -246,24 +287,15 @@ ConcatStringList ConcatStringList::reverse() const {
         roam = roam->next;
     }
 
-    //Reference increase
-    if (result->nNode == 1) {
-        refList.addFrontRefNode(result->head, 2);
-    }
-    else {
-        refList.addFrontRefNode(result->head, 1);
-        refList.addFrontRefNode(result->tail, 1);
-    }
-    //refList.increaseNumOfRefAt(result.head, 1);
-    //refList.increaseNumOfRefAt(result.tail, 1);
-    refList.sortRef();
-    //
-    return *result;
+    result.isTemporary = true;
+    return result;
 }
 
 //Destructor section
 
 ConcatStringList::~ConcatStringList() {
+    if (isTemporary) return;
+
     refList.increaseNumOfRefAt(head, -1);
     refList.increaseNumOfRefAt(tail, -1);
 
@@ -278,7 +310,14 @@ ConcatStringList::~ConcatStringList() {
     
 }
 
-
+void ConcatStringList::deleteTValueCSL(const ConcatStringList &other) {
+    CharALNode* roam = other.head;
+    while (roam != other.tail->next) {
+        CharALNode* tp = roam;
+        roam = roam->next;
+        delete tp;
+    }
+}
 
 //References List Function
 
@@ -472,9 +511,10 @@ string ConcatStringList::DeleteStringList::totalRefCountsString() const {
 int ConcatStringList::DeleteStringList::sumHeadAndTailNumOfRef(DelNode* tpDN) const {
     RefNode* headRN = tpDN->chainRN[0];
     RefNode* tailRN = tpDN->chainRN[tpDN->nChainRN - 1];
-    // if(!headRN || !tailRN ){
-    //     return 0;
-    // }
+    if(!headRN || !tailRN ){
+        return 0;
+    }
+
     if (headRN == tailRN) {
         return headRN->nReference;
     }

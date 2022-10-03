@@ -4,10 +4,13 @@
 #include "main.h"
 
 
+
+
 struct CharALNode {
     CharALNode* next;
     string CharArrayList;
 
+    CharALNode();
     CharALNode(string s, CharALNode* _next);
 };
 
@@ -30,8 +33,8 @@ struct DelNode {
 class ConcatStringList {
 private:
     CharALNode* head, * tail;
-    int nNode = 0, nChar = 0;
-    bool isAllocated;
+    int nNode, nChar ;
+    bool isConcated, isTemporary;
 public:
     class ReferencesList; // forward declaration
     class DeleteStringList; // forward declaration
@@ -46,6 +49,7 @@ public:
 
     ConcatStringList();
     ConcatStringList(const char* s);
+    ConcatStringList(const ConcatStringList& other);
     int length() const;
     char get(int index) const;
     int indexOf(char c) const;
@@ -53,7 +57,7 @@ public:
     ConcatStringList concat(const ConcatStringList& otherS) const;
     ConcatStringList subString(int from, int to) const;
     ConcatStringList reverse() const;
-    void DeleteNode();
+    void deleteTValueCSL(const ConcatStringList& other);
     ~ConcatStringList();
 
 
@@ -61,7 +65,7 @@ public:
     class ReferencesList {
         // TODO: may provide some attributes
         RefNode* headRef = nullptr, * tailRef = nullptr;
-        int nNodeRef = 0;
+        int nNodeRef;
 
         friend class ConcatStringList;
         friend class DeleteStringList;
@@ -84,7 +88,7 @@ public:
     class DeleteStringList {
         // TODO: may provide some attributes
         DelNode* headDel = nullptr, * tailDel = nullptr;
-        int nNodeDel = 0;
+        int nNodeDel ;
 
         friend class ConcatStringList;
         friend class ReferencesList;
