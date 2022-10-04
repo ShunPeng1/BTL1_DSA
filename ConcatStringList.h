@@ -4,8 +4,6 @@
 #include "main.h"
 
 
-
-
 struct CharALNode {
     CharALNode* next;
     string CharArrayList;
@@ -19,7 +17,8 @@ struct RefNode {
     CharALNode* original;
     int nReference;
     bool isDeleted;
-    RefNode(RefNode* _next, CharALNode* _original, int _nRef);
+    bool isHeadOrTail;
+    RefNode(RefNode* _next, CharALNode* _original, int _nRef, bool _isHeadOrTail);
 
 };
 
@@ -46,18 +45,16 @@ public:
         return head == nullptr;
     }
 
-
     ConcatStringList();
     ConcatStringList(const char* s);
-    ConcatStringList(const ConcatStringList& other);
+    ConcatStringList(const ConcatStringList& );
     int length() const;
-    char get(int index) const;
-    int indexOf(char c) const;
+    char get(int ) const;
+    int indexOf(char ) const;
     std::string toString() const;
-    ConcatStringList concat(const ConcatStringList& otherS) const;
-    ConcatStringList subString(int from, int to) const;
+    ConcatStringList concat(const ConcatStringList& ) const;
+    ConcatStringList subString(int , int) const;
     ConcatStringList reverse() const;
-    void deleteTValueCSL(const ConcatStringList& other);
     ~ConcatStringList();
 
 
@@ -65,7 +62,7 @@ public:
     class ReferencesList {
         // TODO: may provide some attributes
         RefNode* headRef = nullptr, * tailRef = nullptr;
-        int nNodeRef;
+        int nNodeRef=0;
 
         friend class ConcatStringList;
         friend class DeleteStringList;
@@ -76,9 +73,8 @@ public:
         std::string refCountsString() const;
 
         //Reference Additional Function
-        void printRefDebug();
-        void addFrontRefNode(CharALNode*, int);
-        void increaseNumOfRefAt(CharALNode*, int);
+        void addFrontRefNode(CharALNode*, int, bool);
+        void increaseNumOfRefAt(CharALNode*, int, bool);
         RefNode* getRNPointer(CharALNode*);
         void sortRef();
         bool compareRef(RefNode*, RefNode*);
@@ -88,7 +84,7 @@ public:
     class DeleteStringList {
         // TODO: may provide some attributes
         DelNode* headDel = nullptr, * tailDel = nullptr;
-        int nNodeDel ;
+        int nNodeDel=0 ;
 
         friend class ConcatStringList;
         friend class ReferencesList;
