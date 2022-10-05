@@ -1,7 +1,6 @@
 #include "ConcatStringList.h"
 
 
-
 //ALL OF MY #DEFINE ARE FOR PERSONAL USE AND PREVENT PLAGIARISM TO SOME EXTENDS 
 
 typedef long long ll;
@@ -20,27 +19,22 @@ typedef long long ll;
 #define YES cout<<"YES"
 #define NO cout<<"NO"
 
-#define CSL ConcatStringList
-#define RL ConcatStringList::ReferencesList
-#define DL ConcatStringList::DeleteStringList
-#define RN RefNode
-#define DN DelNode
-#define CALN CharALNode
+//typedef all the class because it is long af
 
-RL CSL::refList = RL();
-DL CSL::delStrList = DL();
+ConcatStringList::ReferencesList ConcatStringList::refList = ConcatStringList::ReferencesList();
+ConcatStringList::DeleteStringList ConcatStringList::delStrList = ConcatStringList::DeleteStringList();
 //struct Node
-CALN::CALN() {
+CharALNode::CharALNode() {
     next = nullptr;
     CharArrayList = "";
 }
 
-CALN::CALN(string s, CALN* _next) {
+CharALNode::CharALNode(string s, CharALNode* _next) {
     next = _next;
     CharArrayList = s;
 }
 
-RN::RN(RN* _next, CALN* _original, int _nRef, bool _isHeadOrTail) {
+RefNode::RefNode(RefNode* _next, CharALNode* _original, int _nRef, bool _isHeadOrTail) {
     next = _next;
     original = _original;
     nReference = _nRef;
@@ -48,26 +42,26 @@ RN::RN(RN* _next, CALN* _original, int _nRef, bool _isHeadOrTail) {
     isHeadOrTail = _isHeadOrTail;
 }
 
-DN::DN(DN* _next, CALN* headCALN, CALN* tailCALN, int length) {
+DelNode::DelNode(DelNode* _next, CharALNode* headCALN, CharALNode* tailCALN, int length) {
     next = _next;
     nChainRN = length;
 
-    //array of RN to traverse in DeleteCALN
-    chainRN = new RN * [length];
+    //array of RefNode to traverse in DeleteCALN
+    chainRN = new RefNode * [length];
     for (int i = 0; i < length; i++) {
-        chainRN[i] = CSL::refList.getRNPointer(headCALN);
+        chainRN[i] = ConcatStringList::refList.getRNPointer(headCALN);
         headCALN = headCALN->next;
     }
     if (headCALN != tailCALN->next) {
-        throw logic_error("DN: Concat nNode struct size is wrong");
+        throw logic_error("DelNode: Concat nNode struct size is wrong");
     }
 }
 
-DN::~DN() {
+DelNode::~DelNode() {
     delete[] chainRN;
 }
 
-CSL::CSL() {
+ConcatStringList::ConcatStringList() {
     nChar = 0;
     nNode = 0;
     isConcated = false;
@@ -76,7 +70,7 @@ CSL::CSL() {
     tail = nullptr;
 }
 
-CSL::CSL(const char* s) {
+ConcatStringList::ConcatStringList(const char* s) {
     int i = 0;
     string tp = "";
     while (s[i] != '\0') {
@@ -84,7 +78,7 @@ CSL::CSL(const char* s) {
         i++;
     }
 
-    CALN* tpCALN = new CALN(s, nullptr);
+    CharALNode* tpCALN = new CharALNode(s, nullptr);
     head = tpCALN;
     tail = tpCALN;
 
@@ -99,7 +93,7 @@ CSL::CSL(const char* s) {
     //
 }
 
-CSL::CSL(const CSL & otherS) {
+ConcatStringList::ConcatStringList(const ConcatStringList && otherS) {
     this->head = nullptr;
     this->tail = nullptr;
     this->isConcated = false;
@@ -112,13 +106,13 @@ CSL::CSL(const CSL & otherS) {
         this->tail = otherS.tail;
         refList.increaseNumOfRefAt(this->head, 1, true);
         refList.increaseNumOfRefAt(this->tail, 1, true);
-
+        
         refList.sortRef();
     }
     else {//is return from the reverse or substring so we deep copy
-        CALN* roam = otherS.head;
+        CharALNode* roam = otherS.head;
         while (roam != otherS.tail->next) {
-            CALN* tpCALN = new CALN();
+            CharALNode* tpCALN = new CharALNode();
             *tpCALN = *roam;
             refList.addFrontRefNode(tpCALN, 0, false);
             if (this->tail == nullptr) {
@@ -133,18 +127,19 @@ CSL::CSL(const CSL & otherS) {
         }
         if (this->nNode == 1) {
             refList.increaseNumOfRefAt(this->head, 2, true);
-            
+            refList.nNodeRef+=1;
         }
         else {
             refList.increaseNumOfRefAt(this->head, 1 , true);
             refList.increaseNumOfRefAt(this->tail, 1 , true);
+            refList.nNodeRef += 2;
         }
         refList.sortRef();
 
         //Delete tvalue otherS
         roam = otherS.head;
         while (roam) {
-            CALN* tp = roam;
+            CharALNode* tp = roam;
             roam = roam->next;
             delete tp;
         }
@@ -152,18 +147,18 @@ CSL::CSL(const CSL & otherS) {
     
 }
 
-// CSL function
-int CSL::length() const {
+// ConcatStringList function
+int ConcatStringList::length() const {
     return nChar;
 }
 
-char CSL::get(int index) const {
+char ConcatStringList::get(int index) const {
     if (index < 0 || index >= nChar) {
         throw out_of_range("Index of string is invalid!");
     }
 
     int tpSize = 0;
-    CALN* roam = head;
+    CharALNode* roam = head;
     while (roam) {
         if (index < tpSize + roam->CharArrayList.size()) {
             return roam->CharArrayList[index - tpSize];
@@ -174,9 +169,9 @@ char CSL::get(int index) const {
     return '\0';
 }
 
-int CSL::indexOf(char c) const {
+int ConcatStringList::indexOf(char c) const {
     int tpSize = 0;
-    CALN* roam = head;
+    CharALNode* roam = head;
     while (roam != nullptr) {
         FOR(i, 0, roam->CharArrayList.size()) {
             if (c == roam->CharArrayList[i]) return tpSize + i;
@@ -187,9 +182,9 @@ int CSL::indexOf(char c) const {
     return -1;
 }
 
-string CSL::toString() const {
+string ConcatStringList::toString() const {
     string output = "";
-    CALN* roam = head;
+    CharALNode* roam = head;
     while (roam != tail->next) {
         output += roam->CharArrayList;
         roam = roam->next;
@@ -198,21 +193,22 @@ string CSL::toString() const {
     return output;
 }
 
-CSL CSL::concat(const CSL& otherS) const {
+ConcatStringList ConcatStringList::concat(const ConcatStringList& otherS) const {
 
     tail->next = otherS.head;
 
-    CSL nObj;
-    nObj.head = head;
-    nObj.tail = otherS.tail;
-    nObj.nNode = nNode + otherS.nNode;
-    nObj.nChar = nChar + otherS.nChar;
-    nObj.isConcated = true;
-    nObj.isTemporary = true;
-    return nObj;
+    ConcatStringList result;
+    result.head = head;
+    result.tail = otherS.tail;
+    result.nNode = nNode + otherS.nNode;
+    result.nChar = nChar + otherS.nChar;
+    result.isConcated = true;
+    result.isTemporary = true;
+
+    return (ConcatStringList&&)result;
 }
 
-CSL CSL::subString(int from, int to) const {
+ConcatStringList ConcatStringList::subString(int from, int to) const {
     if (from <0 || to>nChar) {
         throw out_of_range("Index of string is invalid");
     }
@@ -221,10 +217,10 @@ CSL CSL::subString(int from, int to) const {
         throw logic_error("Invalid range");
     }
 
-    CSL result ;
+    ConcatStringList result ;
     result.nChar = to - from;
 
-    CALN* roam = head;
+    CharALNode* roam = head;
     int tpSize = 0;
     while (roam != tail->next) {
 
@@ -236,7 +232,7 @@ CSL CSL::subString(int from, int to) const {
             }
         }
         if (tpStr.size()) {
-            CALN* tpCALN = new CALN(tpStr, nullptr);
+            CharALNode* tpCALN = new CharALNode(tpStr, nullptr);
             result.nNode++;
 
             //Reference Add
@@ -258,15 +254,16 @@ CSL CSL::subString(int from, int to) const {
     }
 
     result.isTemporary = true;
-    return result;
+
+    return (ConcatStringList&&)result;
 }
 
-CSL CSL::reverse() const {
-    CSL result;
+ConcatStringList ConcatStringList::reverse() const {
+    ConcatStringList result;
     result.nNode = nNode;
     result.nChar = nChar;
 
-    CALN* roam = head;
+    CharALNode* roam = head;
     int tpSize = 0;
     while (roam != tail->next) {
 
@@ -276,7 +273,7 @@ CSL CSL::reverse() const {
         }
 
         if (tpStr.size()) {
-            CALN* tpCALN = new CALN(tpStr, nullptr);
+            CharALNode* tpCALN = new CharALNode(tpStr, nullptr);
 
             //Reference Add
             //refList.addFrontRefNode(tpCALN, 0);
@@ -296,18 +293,19 @@ CSL CSL::reverse() const {
     }
 
     result.isTemporary = true;
-    return result;
+
+    return (ConcatStringList&&)result;
 }
 
 //Destructor section
 
-CSL::~CSL() {
+ConcatStringList::~ConcatStringList() {
     if (isTemporary) return;
 
     refList.increaseNumOfRefAt(head, -1, true);
     refList.increaseNumOfRefAt(tail, -1, true);
 
-    DN* tpDN = new DN(nullptr, head, tail, nNode);
+    DelNode* tpDN = new DelNode(nullptr, head, tail, nNode);
     delStrList.addBackDelNode(tpDN);
     delStrList.loopToDeallocateNode();
 
@@ -319,16 +317,16 @@ CSL::~CSL() {
 
 //References List Function
 
-int RL::size() const {
+int ConcatStringList::ReferencesList::size() const {
     return nNodeRef;
 }
 
-int RL::refCountAt(int index) const {
+int ConcatStringList::ReferencesList::refCountAt(int index) const {
     if (index < 0 || index >= nNodeRef) {
         throw out_of_range("Index of references list is invalid!");
     }
 
-    RN* roam = headRef;
+    RefNode* roam = headRef;
     int tpSize = 0;
     while (roam != nullptr) {
         if (tpSize == index) {
@@ -341,10 +339,10 @@ int RL::refCountAt(int index) const {
     return 0;
 }
 
-string RL::refCountsString() const {
+string ConcatStringList::ReferencesList::refCountsString() const {
 
     string res = "RefCounts[";
-    RN* roam = headRef;
+    RefNode* roam = headRef;
 
     while (roam != nullptr) {
         if (roam->isHeadOrTail) {
@@ -363,8 +361,8 @@ string RL::refCountsString() const {
 
 //Reference List Additional Function
 
-void RL::addFrontRefNode(CALN* tpCALN, int nRef , bool isHeadOrTail) {
-    RN* tpNode = new RN(nullptr, tpCALN, nRef, isHeadOrTail);
+void ConcatStringList::ReferencesList::addFrontRefNode(CharALNode* tpCALN, int nRef , bool isHeadOrTail) {
+    RefNode* tpNode = new RefNode(nullptr, tpCALN, nRef, isHeadOrTail);
 
     if (nNodeRef == 0) {
         headRef = tpNode;
@@ -375,12 +373,12 @@ void RL::addFrontRefNode(CALN* tpCALN, int nRef , bool isHeadOrTail) {
         tpNode->next = headRef;
         headRef = tpNode;
     }
-    nNodeRef++;
+    if(isHeadOrTail) nNodeRef++;
     return;
 }
 
-void RL::increaseNumOfRefAt(CALN* tpCALN, int value, bool changeIsHeadOrTail) {
-    RN* roam = refList.headRef;
+void ConcatStringList::ReferencesList::increaseNumOfRefAt(CharALNode* tpCALN, int value, bool changeIsHeadOrTail) {
+    RefNode* roam = refList.headRef;
     while (roam) {
         if (roam->original == tpCALN) {
             roam->nReference += value;
@@ -391,8 +389,8 @@ void RL::increaseNumOfRefAt(CALN* tpCALN, int value, bool changeIsHeadOrTail) {
     }
 }
 
-RN* RL::getRNPointer(CALN* tpCALN) {
-    RN* roam = refList.headRef;
+RefNode* ConcatStringList::ReferencesList::getRNPointer(CharALNode* tpCALN) {
+    RefNode* roam = refList.headRef;
     while (roam) {
         if (roam->original == tpCALN) {
             return roam;
@@ -403,14 +401,14 @@ RN* RL::getRNPointer(CALN* tpCALN) {
     return nullptr;
 }
 
-void RL::sortRef() {
+void ConcatStringList::ReferencesList::sortRef() {
 
     if (headRef == nullptr) {
         return;
     }
 
     FOR(i, 0, refList.size()) {
-        RN* currRN = headRef, * nextRN = headRef->next, * prevRN = nullptr;
+        RefNode* currRN = headRef, * nextRN = headRef->next, * prevRN = nullptr;
         bool isSorted = 1;
         while (nextRN != nullptr) {
             if (compareRef(currRN, nextRN)) {
@@ -422,7 +420,7 @@ void RL::sortRef() {
                 if (headRef == currRN) headRef = nextRN;
                 if (tailRef == nextRN) tailRef = currRN;
 
-                RN* tpRN = currRN;
+                RefNode* tpRN = currRN;
                 currRN = nextRN;
                 nextRN = tpRN;
 
@@ -440,7 +438,7 @@ void RL::sortRef() {
     }
 }
 
-bool RL::compareRef(RN* first, RN* second) {
+bool ConcatStringList::ReferencesList::compareRef(RefNode* first, RefNode* second) {
     if (second->nReference == 0) {
         return false;
     }
@@ -453,8 +451,8 @@ bool RL::compareRef(RN* first, RN* second) {
     return false;
 }
 
-void RL::DeleteIfAll0() {
-    RN* roam = headRef;
+void ConcatStringList::ReferencesList::DeleteIfAll0() {
+    RefNode* roam = headRef;
     int sum = 0;
     while (roam) {
         sum += roam->nReference;
@@ -465,7 +463,7 @@ void RL::DeleteIfAll0() {
     roam = headRef;
     while (roam)
     {
-        RN* tp = roam;
+        RefNode* tp = roam;
         roam = roam->next;
         delete tp;
     }
@@ -475,13 +473,13 @@ void RL::DeleteIfAll0() {
 }
 
 //Delete List Function
-int DL::size() const {
+int ConcatStringList::DeleteStringList::size() const {
     return nNodeDel;
 }
 
-string DL::totalRefCountsString() const {
+string ConcatStringList::DeleteStringList::totalRefCountsString() const {
     string res = "TotalRefCounts[";
-    DN* roam = headDel;
+    DelNode* roam = headDel;
 
     while (roam != nullptr) {
         res += to_string(sumHeadAndTailNumOfRef(roam));
@@ -494,9 +492,9 @@ string DL::totalRefCountsString() const {
 
 
 //Delete List Additional Fuction
-int DL::sumHeadAndTailNumOfRef(DN* tpDN) const {
-    RN* headRN = tpDN->chainRN[0];
-    RN* tailRN = tpDN->chainRN[tpDN->nChainRN - 1];
+int ConcatStringList::DeleteStringList::sumHeadAndTailNumOfRef(DelNode* tpDN) const {
+    RefNode* headRN = tpDN->chainRN[0];
+    RefNode* tailRN = tpDN->chainRN[tpDN->nChainRN - 1];
     if(!headRN || !tailRN ){
         return 0;
     }
@@ -507,7 +505,7 @@ int DL::sumHeadAndTailNumOfRef(DN* tpDN) const {
     return headRN->nReference + tailRN->nReference;
 }
 
-void DL::addBackDelNode(DN*& tpDN) {
+void ConcatStringList::DeleteStringList::addBackDelNode(DelNode*& tpDN) {
     if (headDel == nullptr && tailDel == nullptr) {
         headDel = tpDN;
         tailDel = tpDN;
@@ -519,26 +517,26 @@ void DL::addBackDelNode(DN*& tpDN) {
     nNodeDel++;
 }
 
-void DL::loopToDeallocateNode() {
+void ConcatStringList::DeleteStringList::loopToDeallocateNode() {
     //Copy from https://www.geeksforgeeks.org/delete-occurrences-given-key-linked-list/
     if (headDel == nullptr) {
         return;
     }
     //remove front until unsatisfy
     while (headDel != nullptr && sumHeadAndTailNumOfRef(headDel) == 0) {
-        DN* tp = headDel;
+        DelNode* tp = headDel;
         headDel = headDel->next;
 
         deleteCharALNode(tp);
         nNodeDel--;
         delete tp;
     }
-    DN* curr = headDel, * prev = nullptr;
+    DelNode* curr = headDel, * prev = nullptr;
 
     //remove the rest
     while (curr != nullptr) {
         if (sumHeadAndTailNumOfRef(curr) == 0) {
-            DN* tp = curr;
+            DelNode* tp = curr;
             if(prev!= nullptr) prev->next = curr->next;
             curr = curr->next;
 
@@ -557,10 +555,10 @@ void DL::loopToDeallocateNode() {
 }
 
 
-void DL::deleteCharALNode(DN* tpDN) {
+void ConcatStringList::DeleteStringList::deleteCharALNode(DelNode* tpDN) {
 
     FOR(i, 0, tpDN->nChainRN) {
-        RN* tpRN = tpDN->chainRN[i];
+        RefNode* tpRN = tpDN->chainRN[i];
 
         if (tpRN != nullptr) if (!tpRN->isDeleted) {
             delete (tpRN->original);

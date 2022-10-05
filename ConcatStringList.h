@@ -4,6 +4,7 @@
 #include "main.h"
 
 
+
 struct CharALNode {
     CharALNode* next;
     string CharArrayList;
@@ -47,7 +48,7 @@ public:
 
     ConcatStringList();
     ConcatStringList(const char* s);
-    ConcatStringList(const ConcatStringList& );
+    ConcatStringList(const ConcatStringList&& );
     int length() const;
     char get(int ) const;
     int indexOf(char ) const;
