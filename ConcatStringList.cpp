@@ -52,9 +52,6 @@ DelNode::DelNode(DelNode* _next, CharALNode* headCALN, CharALNode* tailCALN, int
         chainRN[i] = ConcatStringList::refList.getRNPointer(headCALN);
         headCALN = headCALN->next;
     }
-    if (headCALN != tailCALN->next) {
-        throw logic_error("DelNode: Concat nNode struct size is wrong");
-    }
 }
 
 DelNode::~DelNode() {
@@ -89,7 +86,7 @@ ConcatStringList::ConcatStringList(const char* s) {
 
     //Reference
     refList.addFrontRefNode(tpCALN, 2, true);
-    refList.sortRef();
+    //refList.sortRef();
     //
 }
 
@@ -107,7 +104,6 @@ ConcatStringList::ConcatStringList(const ConcatStringList && otherS) {
         refList.increaseNumOfRefAt(this->head, 1, true);
         refList.increaseNumOfRefAt(this->tail, 1, true);
         
-        refList.sortRef();
     }
     else {//is return from the reverse or substring so we deep copy
         CharALNode* roam = otherS.head;
@@ -134,7 +130,7 @@ ConcatStringList::ConcatStringList(const ConcatStringList && otherS) {
             refList.increaseNumOfRefAt(this->tail, 1 , true);
             refList.nNodeRef += 2;
         }
-        refList.sortRef();
+        //refList.sortRef();
 
         //Delete tvalue otherS
         roam = otherS.head;
@@ -231,7 +227,7 @@ ConcatStringList ConcatStringList::subString(int from, int to) const {
                 tpStr += roam->CharArrayList[i];
             }
         }
-        if (tpStr.size()) {
+        if (tpStr.size()|| (roam->CharArrayList.size() == 0 && tpSize >=from && tpSize<=to)) {
             CharALNode* tpCALN = new CharALNode(tpStr, nullptr);
             result.nNode++;
 
@@ -272,21 +268,20 @@ ConcatStringList ConcatStringList::reverse() const {
             tpStr += roam->CharArrayList[i];
         }
 
-        if (tpStr.size()) {
-            CharALNode* tpCALN = new CharALNode(tpStr, nullptr);
+        CharALNode* tpCALN = new CharALNode(tpStr, nullptr);
 
-            //Reference Add
-            //refList.addFrontRefNode(tpCALN, 0);
+        //Reference Add
+        //refList.addFrontRefNode(tpCALN, 0);
 
-            if (result.tail == nullptr) {
-                result.head = tpCALN;
-                result.tail = tpCALN;
-            }
-            else {
-                tpCALN->next = result.head;
-                result.head = tpCALN;
-            }
+        if (result.tail == nullptr) {
+            result.head = tpCALN;
+            result.tail = tpCALN;
         }
+        else {
+            tpCALN->next = result.head;
+            result.head = tpCALN;
+        }
+        
 
         tpSize += roam->CharArrayList.size();
         roam = roam->next;
@@ -326,6 +321,8 @@ int ConcatStringList::ReferencesList::refCountAt(int index) const {
         throw out_of_range("Index of references list is invalid!");
     }
 
+    refList.sortRef();
+
     RefNode* roam = headRef;
     int tpSize = 0;
     while (roam != nullptr) {
@@ -340,19 +337,18 @@ int ConcatStringList::ReferencesList::refCountAt(int index) const {
 }
 
 string ConcatStringList::ReferencesList::refCountsString() const {
-
+    refList.sortRef();
     string res = "RefCounts[";
     RefNode* roam = headRef;
 
     while (roam != nullptr) {
         if (roam->isHeadOrTail) {
             res += to_string(roam->nReference);
-            roam = roam->next;
-            if (roam != nullptr) res += ',';
         }
-        else {
-            roam = roam->next;
-        }
+
+        roam = roam->next;
+
+        if(roam!=nullptr) if(roam->isHeadOrTail ) res+= ',';
     }
     res += "]";
     return res;
