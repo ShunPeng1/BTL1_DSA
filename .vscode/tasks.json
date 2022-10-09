@@ -8,8 +8,10 @@
                 "-fdiagnostics-color=always",
                 "-g",
                 "${fileDirname}\\**.cpp",
+                "-I . -std=c++11",
                 "-o",
                 "${fileDirname}\\${fileBasenameNoExtension}.exe"
+
             ],
             "options": {
                 "cwd": "${fileDirname}"

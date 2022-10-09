@@ -3,14 +3,17 @@
 
 #include "main.h"
 
-
+struct CharALNode;
+struct RefNode;
+struct DelNode;
 
 struct CharALNode {
     CharALNode* next;
+    RefNode* referenceNode;
     string CharArrayList;
 
     CharALNode();
-    CharALNode(string s, CharALNode* _next);
+    CharALNode(string s, CharALNode* _next,RefNode *referenceNode);
 };
 
 struct RefNode {
@@ -33,7 +36,7 @@ struct DelNode {
 class ConcatStringList {
 private:
     CharALNode* head, * tail;
-    int nNode, nChar ;
+    int nNode, nChar;
     bool isConcated, isTemporary;
 public:
     class ReferencesList; // forward declaration
@@ -48,13 +51,13 @@ public:
 
     ConcatStringList();
     ConcatStringList(const char* s);
-    ConcatStringList(const ConcatStringList&& );
+    ConcatStringList(const ConcatStringList&&);
     int length() const;
-    char get(int ) const;
-    int indexOf(char ) const;
+    char get(int) const;
+    int indexOf(char) const;
     std::string toString() const;
-    ConcatStringList concat(const ConcatStringList& ) const;
-    ConcatStringList subString(int , int) const;
+    ConcatStringList concat(const ConcatStringList&) const;
+    ConcatStringList subString(int, int) const;
     ConcatStringList reverse() const;
     ~ConcatStringList();
 
@@ -63,7 +66,7 @@ public:
     class ReferencesList {
         // TODO: may provide some attributes
         RefNode* headRef = nullptr, * tailRef = nullptr;
-        int nNodeRef=0;
+        int nNodeRef = 0;
 
         friend class ConcatStringList;
         friend class DeleteStringList;
@@ -77,15 +80,19 @@ public:
         void addFrontRefNode(CharALNode*, int, bool);
         void increaseNumOfRefAt(CharALNode*, int, bool);
         RefNode* getRNPointer(CharALNode*);
-        void sortRef();
-        bool compareRef(RefNode*, RefNode*);
         void DeleteIfAll0();
+
+        //Sort function
+        void  mergeSort(RefNode**);
+        RefNode* sortedMerge(RefNode* , RefNode* );
+        void  frontBackSplit(RefNode*, RefNode**, RefNode**);
+        bool compareRef(RefNode*, RefNode*);
     };
 
     class DeleteStringList {
         // TODO: may provide some attributes
         DelNode* headDel = nullptr, * tailDel = nullptr;
-        int nNodeDel=0 ;
+        int nNodeDel = 0;
 
         friend class ConcatStringList;
         friend class ReferencesList;
